@@ -4,7 +4,7 @@ from sqlalchemy import Column, Integer, String, Numeric, create_engine, text
 app = Flask(__name__)
 
 conn_str = "mysql://root:5676@localhost/boatdb"
-engine = create_engine(conn_str, echo=True)
+engine = create_engine(conn_str, echo=True, isolation_level="READ COMMITTED")
 conn = engine.connect()
 
 
@@ -39,6 +39,7 @@ def create_boat():
             text("INSERT INTO boats values (:id, :name, :type, :owner_id, :rental_price)"),
             request.form
         )
+        conn.commit()
         return render_template('boats_create.html', error=None, success="Data inserted successfully!")
     except Exception as e:
         error = e.orig.args[1]
@@ -62,6 +63,7 @@ def delete_boat():
             text("DELETE FROM boats WHERE id = :id"),
             request.form
         )
+        conn.commit()
         return render_template('boats_delete.html', error=None, success="Data inserted successfully!")
     except Exception as e:
         error = e.orig.args[1]
